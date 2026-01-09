@@ -27,7 +27,7 @@ type Marshaller struct {
 
 // Messages returns list of the message types supported by marshaller.
 func (m Marshaller) Messages() []any {
-	return []any{
+	return []any {
 		Hello{},
 		Header{},
 	}
@@ -303,7 +303,7 @@ func unmarshal2(m *MessageDescriptor, b []byte) uint64 {
 			var l uint64
 			helpers.UInt64Unmarshal(&l, b, &o)
 			if l > 0 {
-				m.Namespace = Namespace(b[o : o+l])
+				m.Namespace = Namespace(b[o:o+l])
 				o += l
 			}
 		}
@@ -520,7 +520,7 @@ func unmarshal3(m *NamespaceRequest, b []byte) uint64 {
 			var l uint64
 			helpers.UInt64Unmarshal(&l, b, &o)
 			if l > 0 {
-				m.Namespace = Namespace(b[o : o+l])
+				m.Namespace = Namespace(b[o:o+l])
 				o += l
 			}
 		}
