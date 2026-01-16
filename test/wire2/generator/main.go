@@ -8,7 +8,7 @@ import (
 //go:generate go run .
 func main() {
 	proton.Generate("../types.proton.go",
-		proton.Message(wire2.Msg1{}),
-		proton.Message(wire2.Msg2{}),
+		proton.Message[wire2.Msg1](),
+		proton.Message[wire2.Msg2](),
 	)
 }
