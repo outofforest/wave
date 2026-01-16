@@ -7,7 +7,7 @@ require (
 	github.com/outofforest/parallel v0.2.3
 	github.com/outofforest/proton v0.19.0
 	github.com/outofforest/qa v0.3.0
-	github.com/outofforest/resonance v0.23.0
+	github.com/outofforest/resonance v0.25.0
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.1

@@ -162,14 +162,14 @@ func runServerConn(
 ) error {
 	m := wire.NewMarshaller()
 
-	if err := c.SendProton(&wire.Hello{
+	if _, err := c.SendProton(&wire.Hello{
 		PeerID:   serverID,
 		IsServer: true,
 	}, m); err != nil {
 		return err
 	}
 
-	msg, err := c.ReceiveProton(m)
+	msg, _, err := c.ReceiveProton(m)
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func runServerConn(
 			defer conns.Remove(helloMsg.PeerID, sendCh)
 
 			for {
-				msg, err := c.ReceiveProton(m)
+				msg, _, err := c.ReceiveProton(m)
 				if err != nil {
 					return err
 				}
@@ -210,7 +210,7 @@ func runServerConn(
 					return errors.New("header message expected")
 				}
 
-				contentMsg, err := c.ReceiveRawBytes()
+				contentMsg, _, err := c.ReceiveRawBytes()
 				if err != nil {
 					return err
 				}
@@ -233,10 +233,10 @@ func runServerConn(
 					continue
 				}
 
-				if err := c.SendProton(msgRev.Header, m); err != nil {
+				if _, err := c.SendProton(msgRev.Header, m); err != nil {
 					return err
 				}
-				if err := c.SendRawBytes(msgRev.Content); err != nil {
+				if _, err := c.SendRawBytes(msgRev.Content); err != nil {
 					return err
 				}
 			}
