@@ -242,14 +242,14 @@ func (client *Client) Send(message any, marhsaller proton.Marshaller) error {
 func (client *Client) runConn(ctx context.Context, c *resonance.Connection) error {
 	m := wire.NewMarshaller()
 
-	if err := c.SendProton(&wire.Hello{
+	if _, err := c.SendProton(&wire.Hello{
 		PeerID:   client.conns.clientID,
 		Requests: client.requests,
 	}, m); err != nil {
 		return err
 	}
 
-	msg, err := c.ReceiveProton(m)
+	msg, _, err := c.ReceiveProton(m)
 	if err != nil {
 		return err
 	}
@@ -266,7 +266,7 @@ func (client *Client) runConn(ctx context.Context, c *resonance.Connection) erro
 			defer client.conns.Remove(sendCh)
 
 			for {
-				msg, err := c.ReceiveProton(m)
+				msg, _, err := c.ReceiveProton(m)
 				if err != nil {
 					return err
 				}
@@ -281,7 +281,7 @@ func (client *Client) runConn(ctx context.Context, c *resonance.Connection) erro
 					return errors.Errorf("no marshaller for namespace %q", headerMsg.Revision.Message.Namespace)
 				}
 
-				msg, err = c.ReceiveProton(msgM)
+				msg, _, err = c.ReceiveProton(msgM)
 				if err != nil {
 					return err
 				}
@@ -299,10 +299,10 @@ func (client *Client) runConn(ctx context.Context, c *resonance.Connection) erro
 			defer c.Close()
 
 			for toSend := range sendCh {
-				if err := c.SendProton(toSend.Header, m); err != nil {
+				if _, err := c.SendProton(toSend.Header, m); err != nil {
 					return err
 				}
-				if err := c.SendProton(toSend.Message, toSend.Marshaller); err != nil {
+				if _, err := c.SendProton(toSend.Message, toSend.Marshaller); err != nil {
 					return err
 				}
 			}
