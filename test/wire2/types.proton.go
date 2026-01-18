@@ -86,6 +86,18 @@ func (m Marshaller) Unmarshal(id uint64, buf []byte) (retMsg any, retSize uint64
 	}
 }
 
+// IsPatchNeeded checks if non-empty patch exists.
+func (m Marshaller) IsPatchNeeded(msgDst, msgSrc any) (bool, error) {
+	switch msg2 := msgDst.(type) {
+	case *Msg1:
+		return isPatchNeeded1(msg2, msgSrc.(*Msg1)), nil
+	case *Msg2:
+		return isPatchNeeded0(msg2, msgSrc.(*Msg2)), nil
+	default:
+		return false, errors.Errorf("unknown message type %T", msgDst)
+	}
+}
+
 // MakePatch creates a patch.
 func (m Marshaller) MakePatch(msgDst, msgSrc any, buf []byte) (retID, retSize uint64, retErr error) {
 	defer helpers.RecoverMakePatch(&retErr)
@@ -144,6 +156,19 @@ func unmarshal0(m *Msg2, b []byte) uint64 {
 	}
 
 	return o
+}
+
+func isPatchNeeded0(m, mSrc *Msg2) bool {
+	{
+		// Value
+
+		if !reflect.DeepEqual(m.Value, mSrc.Value) {
+			return true
+		}
+
+	}
+
+	return false
 }
 
 func makePatch0(m, mSrc *Msg2, b []byte) uint64 {
@@ -221,6 +246,19 @@ func unmarshal1(m *Msg1, b []byte) uint64 {
 	}
 
 	return o
+}
+
+func isPatchNeeded1(m, mSrc *Msg1) bool {
+	{
+		// Value
+
+		if !reflect.DeepEqual(m.Value, mSrc.Value) {
+			return true
+		}
+
+	}
+
+	return false
 }
 
 func makePatch1(m, mSrc *Msg1, b []byte) uint64 {
