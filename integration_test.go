@@ -10,6 +10,7 @@ import (
 
 	"github.com/outofforest/parallel"
 	"github.com/outofforest/qa"
+	"github.com/outofforest/resonance"
 	"github.com/outofforest/wave"
 	"github.com/outofforest/wave/test/wire1"
 	"github.com/outofforest/wave/test/wire2"
@@ -35,8 +36,12 @@ func TestSingleServerAndClient(t *testing.T) {
 		ls.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -55,6 +60,7 @@ func TestSingleServerAndClient(t *testing.T) {
 	group.Spawn("client", parallel.Fail, client.Run)
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -95,8 +101,12 @@ func TestOnlyRequestedMessagesAreReceived(t *testing.T) {
 		ls.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -115,6 +125,7 @@ func TestOnlyRequestedMessagesAreReceived(t *testing.T) {
 	group.Spawn("client", parallel.Fail, client.Run)
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -150,9 +161,13 @@ func TestTwoNamespaces(t *testing.T) {
 		ls.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m1 := wire1.NewMarshaller()
 	m2 := wire2.NewMarshaller()
 	clientConfig := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -177,6 +192,7 @@ func TestTwoNamespaces(t *testing.T) {
 	group.Spawn("client", parallel.Fail, client.Run)
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -219,8 +235,12 @@ func TestServerSendsMessagesToNewClient(t *testing.T) {
 		ls1.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -240,6 +260,7 @@ func TestServerSendsMessagesToNewClient(t *testing.T) {
 	group.Spawn("client1", parallel.Fail, client1.Run)
 	group.Spawn("server1", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls1, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -293,8 +314,12 @@ func TestServersExchangeMessages(t *testing.T) {
 		ls2.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig1 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls1.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -305,6 +330,7 @@ func TestServersExchangeMessages(t *testing.T) {
 		},
 	}
 	clientConfig2 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls2.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -325,12 +351,14 @@ func TestServersExchangeMessages(t *testing.T) {
 	group.Spawn("client2", parallel.Fail, client2.Run)
 	group.Spawn("server1", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls1, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
 	})
 	group.Spawn("server2", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls2, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -372,8 +400,12 @@ func TestServerSynchronization(t *testing.T) {
 		ls2.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig1 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls1.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -384,6 +416,7 @@ func TestServerSynchronization(t *testing.T) {
 		},
 	}
 	clientConfig2 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls2.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -404,6 +437,7 @@ func TestServerSynchronization(t *testing.T) {
 	group.Spawn("client2", parallel.Fail, client2.Run)
 	group.Spawn("server1", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls1, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -418,6 +452,7 @@ func TestServerSynchronization(t *testing.T) {
 
 	group.Spawn("server2", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls2, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -452,8 +487,12 @@ func TestOnlyLatestRevisionIsSynced(t *testing.T) {
 		ls2.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig1 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls1.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -464,6 +503,7 @@ func TestOnlyLatestRevisionIsSynced(t *testing.T) {
 		},
 	}
 	clientConfig2 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        []string{ls2.Addr().String()},
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -484,6 +524,7 @@ func TestOnlyLatestRevisionIsSynced(t *testing.T) {
 	group.Spawn("client2", parallel.Fail, client2.Run)
 	group.Spawn("server1", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls1, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -498,6 +539,7 @@ func TestOnlyLatestRevisionIsSynced(t *testing.T) {
 
 	group.Spawn("server2", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls2, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -527,12 +569,17 @@ func TestSameMessagesFromTwoSourcesAreReceived(t *testing.T) {
 		ls.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 	}
 	clientConfig3 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -556,6 +603,7 @@ func TestSameMessagesFromTwoSourcesAreReceived(t *testing.T) {
 	group.Spawn("client2", parallel.Fail, client2.Run)
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
@@ -599,12 +647,17 @@ func TestSameMessageReceivedTwiceIsIgnored(t *testing.T) {
 		ls2.Addr().String(),
 	}
 
+	ca, err := resonance.NewCA(nil)
+	requireT.NoError(err)
+
 	m := wire1.NewMarshaller()
 	clientConfig1 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 	}
 	clientConfig2 := wave.ClientConfig{
+		CA:             ca,
 		Servers:        servers,
 		MaxMessageSize: maxMsgSize,
 		Requests: []wave.RequestConfig{
@@ -624,12 +677,14 @@ func TestSameMessageReceivedTwiceIsIgnored(t *testing.T) {
 	group.Spawn("client1", parallel.Fail, client1.Run)
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls1, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})
 	})
 	group.Spawn("server", parallel.Fail, func(ctx context.Context) error {
 		return wave.RunServer(ctx, ls2, wave.ServerConfig{
+			CA:             ca,
 			Servers:        servers,
 			MaxMessageSize: maxMsgSize,
 		})

@@ -98,6 +98,7 @@ func (c *serverConns) Broadcast(msgRev revision) {
 
 // ServerConfig defines server configuration.
 type ServerConfig struct {
+	CA             *resonance.CA
 	Servers        []string
 	MaxMessageSize uint64
 }
@@ -112,6 +113,7 @@ func RunServer(ctx context.Context, ls net.Listener, config ServerConfig) error 
 	conns := newServerConns()
 	connConfig := resonance.Config{
 		MaxMessageSize: config.MaxMessageSize,
+		CA:             config.CA,
 	}
 
 	return parallel.Run(ctx, func(ctx context.Context, spawn parallel.SpawnFn) (err error) {
