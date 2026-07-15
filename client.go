@@ -133,6 +133,7 @@ func (c *clientConns) Deliver(ctx context.Context, header *wire.Header, msg any)
 
 // ClientConfig is the config of client.
 type ClientConfig struct {
+	CA             *resonance.CA
 	Servers        []string
 	MaxMessageSize uint64
 	Requests       []RequestConfig
@@ -201,6 +202,7 @@ func (client *Client) Run(ctx context.Context) error {
 
 	connConfig := resonance.Config{
 		MaxMessageSize: client.config.MaxMessageSize,
+		CA:             client.config.CA,
 	}
 
 	return parallel.Run(ctx, func(ctx context.Context, spawn parallel.SpawnFn) error {
